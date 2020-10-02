@@ -3,6 +3,7 @@ package com.cars24.biddingsystem.model;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -41,8 +42,8 @@ public class User {
 	@Size(max = 120)
 	private String password;
 
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(	name = "USER_ROLES", 
+	@ManyToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	@JoinTable(name = "USER_ROLES", 
 				joinColumns = @JoinColumn(name = "user_id"), 
 				inverseJoinColumns = @JoinColumn(name = "role_id"))
 	private Set<Role> roles = new HashSet<>();
@@ -54,6 +55,14 @@ public class User {
 		this.username = username;
 		this.email = email;
 		this.password = password;
+	}
+	
+	
+	public User(String username, String email, String password, Role role) {
+		this.username = username;
+		this.email = email;
+		this.password = password;
+		this.roles.add(role);
 	}
 
 	public Long getId() {

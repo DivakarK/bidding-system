@@ -3,8 +3,11 @@ package com.cars24.biddingsystem.model;
 import java.util.Date;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
@@ -17,13 +20,33 @@ public class Bid {
 	@Id
 	@GeneratedValue
 	private long id;
+	
 	@ManyToOne
+	@JoinColumn(name="auction_id")
 	private Auction auction;
+	
 	@OneToOne
+	@JoinColumn(name="user_id")
 	private User user;
+	
+	@Enumerated(EnumType.STRING)
 	private BidStatus status;
+	
 	private float bidPrice;
+	
 	private Date createdDate;
+	
+	public Bid() {
+		// TODO Auto-generated constructor stub
+	}
+	
+	public Bid(Auction auction, User user, BidStatus status, float bidPrice) {
+		this.auction = auction;
+		this.user = user;
+		this.status = status;
+		this.bidPrice = bidPrice;
+		this.createdDate = new Date();
+	}
 	
 	public long getId() {
 		return id;

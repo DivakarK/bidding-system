@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.OneToMany;
@@ -18,9 +20,14 @@ public class Auction {
 	@Id
 	@GeneratedValue
 	private long itemCode;
+	
 	private String itemName;
+	
 	private	float basePrice;
+	
 	private float stepRate;
+	
+	@Enumerated(EnumType.STRING)
 	private AuctionStatus status;
 	
 	public Auction() {
