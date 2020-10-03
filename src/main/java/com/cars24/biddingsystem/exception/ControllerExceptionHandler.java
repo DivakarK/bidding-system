@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
-import com.cars24.biddingsystem.model.ErrorMessage;
+import com.cars24.biddingsystem.rest.model.ErrorMessage;
 
 
 @ControllerAdvice

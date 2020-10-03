@@ -21,8 +21,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cars24.biddingsystem.constants.ERole;
-import com.cars24.biddingsystem.model.Role;
-import com.cars24.biddingsystem.model.User;
+import com.cars24.biddingsystem.jpa.model.Role;
+import com.cars24.biddingsystem.jpa.model.User;
 import com.cars24.biddingsystem.payload.request.LoginRequest;
 import com.cars24.biddingsystem.payload.request.SignupRequest;
 import com.cars24.biddingsystem.payload.response.JwtResponse;

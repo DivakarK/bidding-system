@@ -7,7 +7,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.cars24.biddingsystem.model.User;
+import com.cars24.biddingsystem.jpa.model.User;
 import com.cars24.biddingsystem.repository.UserRepository;
 
 @Service

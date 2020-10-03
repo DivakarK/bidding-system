@@ -24,13 +24,13 @@ import org.springframework.web.bind.annotation.RestController;
 import com.cars24.biddingsystem.constants.AuctionStatus;
 import com.cars24.biddingsystem.exception.AuctionNotFoundException;
 import com.cars24.biddingsystem.exception.UserNotFoundException;
-import com.cars24.biddingsystem.model.Auction;
-import com.cars24.biddingsystem.model.BiddingMessage;
-import com.cars24.biddingsystem.model.User;
+import com.cars24.biddingsystem.jpa.model.Auction;
+import com.cars24.biddingsystem.jpa.model.User;
 import com.cars24.biddingsystem.payload.request.BidRequest;
 import com.cars24.biddingsystem.repository.AuctionRepository;
 import com.cars24.biddingsystem.repository.UserRepository;
 import com.cars24.biddingsystem.rest.model.AuctionResource;
+import com.cars24.biddingsystem.rest.model.BiddingMessage;
 import com.cars24.biddingsystem.services.AuctionService;
 
 @CrossOrigin(origins = "*", maxAge = 3600)

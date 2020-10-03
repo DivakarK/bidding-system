@@ -5,8 +5,8 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.cars24.biddingsystem.model.Auction;
-import com.cars24.biddingsystem.model.Bid;
+import com.cars24.biddingsystem.jpa.model.Auction;
+import com.cars24.biddingsystem.jpa.model.Bid;
 
 @Repository
 public interface BidRepository extends JpaRepository<Bid, Long>{

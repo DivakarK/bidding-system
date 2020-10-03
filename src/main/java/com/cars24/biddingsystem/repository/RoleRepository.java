@@ -6,7 +6,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 import com.cars24.biddingsystem.constants.ERole;
-import com.cars24.biddingsystem.model.Role;
+import com.cars24.biddingsystem.jpa.model.Role;
 
 @Repository
 public interface RoleRepository extends JpaRepository<Role, Long> {

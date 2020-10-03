@@ -18,14 +18,14 @@ import org.springframework.stereotype.Service;
 import com.cars24.biddingsystem.constants.AuctionStatus;
 import com.cars24.biddingsystem.constants.BidStatus;
 import com.cars24.biddingsystem.exception.AuctionNotFoundException;
-import com.cars24.biddingsystem.model.Auction;
-import com.cars24.biddingsystem.model.Bid;
-import com.cars24.biddingsystem.model.BiddingMessage;
-import com.cars24.biddingsystem.model.User;
+import com.cars24.biddingsystem.jpa.model.Auction;
+import com.cars24.biddingsystem.jpa.model.Bid;
+import com.cars24.biddingsystem.jpa.model.User;
 import com.cars24.biddingsystem.payload.request.BidRequest;
 import com.cars24.biddingsystem.repository.AuctionRepository;
 import com.cars24.biddingsystem.repository.BidRepository;
 import com.cars24.biddingsystem.rest.model.AuctionResource;
+import com.cars24.biddingsystem.rest.model.BiddingMessage;
 
 
 @Service
@@ -37,7 +37,6 @@ public class AuctionService {
 	@Autowired
 	private BidRepository bidRepository;
 	
-	@SuppressWarnings("deprecation")
 	public ResponseEntity<Map<String, Object>> find(AuctionStatus status, Pageable paging) {
 		
 		List<Auction> auctions = new ArrayList<Auction>();
@@ -114,25 +113,39 @@ public class AuctionService {
 	 * @param bidRequest
 	 * @return
 	 */
-	public synchronized ResponseEntity<BiddingMessage> updateBid(User user, Auction auction, BidRequest bidRequest) {
+	public synchronized strictfp ResponseEntity<BiddingMessage> updateBid(User user, Auction auction, BidRequest bidRequest) {
 
-		Bid maxBid = auction.getBids().stream().filter(b -> b.getStatus() == BidStatus.ACCEPTED)
-				.collect(Collectors.maxBy(Comparator.comparing(Bid::getBidPrice))).orElseGet(() -> new Bid());
-
-		float minBidAllowed = Float.sum(auction.getStepRate(), maxBid.getBidPrice());
-
+		float basePrice = auction.getBasePrice();
+		float stepRate = auction.getStepRate();
+		
+		float initialBidPrice = Float.sum(basePrice, stepRate);
+		
+		Bid maxBid = auction.getBids().stream()
+						.filter(b -> b.getStatus() == BidStatus.ACCEPTED)
+						.collect(Collectors.maxBy(Comparator.comparing(Bid::getBidPrice)))
+						.orElseGet(() -> new Bid());
+		
+		float minAllowedBid = 0.0f;
+		float maxBidAmount = maxBid.getBidPrice();
+		System.out.println("Min price:: " + maxBid.getBidPrice());
+		if(maxBidAmount == 0.0f) {
+			minAllowedBid = initialBidPrice;
+		} else {
+			minAllowedBid = Float.sum(stepRate, maxBidAmount);
+		}
+		
 		BiddingMessage bm = new BiddingMessage();
 		ResponseEntity<BiddingMessage> response;
 
-		if (bidRequest.getBidAmount() > minBidAllowed) {
+		if (bidRequest.getBidAmount() > minAllowedBid) {
 			this.bidRepository.save(new Bid(auction, user, BidStatus.ACCEPTED, bidRequest.getBidAmount()));
 			bm.setMessage("Bidding Accepted");
 			response = new ResponseEntity<>(bm, HttpStatus.CREATED);
 		} else {
 			this.bidRepository.save(new Bid(auction, user, BidStatus.REJECTED, bidRequest.getBidAmount()));
 			bm.setMessage("Bidding Rejected");
-			bm.setDescription("Rejected because your bidding amount " + bidRequest.getBidAmount()
-					+ " is less than min bid amount " + minBidAllowed);
+			bm.setDescription("Because your bidding amount " + bidRequest.getBidAmount()
+					+ " is less than or equal to min_bid_amount " + minAllowedBid);
 			response = new ResponseEntity<>(bm, HttpStatus.NOT_ACCEPTABLE);
 		}
 

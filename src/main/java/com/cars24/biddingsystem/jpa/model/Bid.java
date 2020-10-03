@@ -1,4 +1,4 @@
-package com.cars24.biddingsystem.model;
+package com.cars24.biddingsystem.jpa.model;
 
 import java.util.Date;
 

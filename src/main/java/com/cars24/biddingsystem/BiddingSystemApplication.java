@@ -9,9 +9,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.cars24.biddingsystem.constants.AuctionStatus;
 import com.cars24.biddingsystem.constants.ERole;
-import com.cars24.biddingsystem.model.Auction;
-import com.cars24.biddingsystem.model.Role;
-import com.cars24.biddingsystem.model.User;
+import com.cars24.biddingsystem.jpa.model.Auction;
+import com.cars24.biddingsystem.jpa.model.Role;
+import com.cars24.biddingsystem.jpa.model.User;
 import com.cars24.biddingsystem.repository.AuctionRepository;
 import com.cars24.biddingsystem.repository.UserRepository;
 

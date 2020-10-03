@@ -1,4 +1,4 @@
-package com.cars24.biddingsystem.model;
+package com.cars24.biddingsystem.rest.model;
 
 import java.util.Date;
 
