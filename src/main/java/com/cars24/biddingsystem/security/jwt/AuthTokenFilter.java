@@ -19,7 +19,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import com.cars24.biddingsystem.security.services.UserDetailsServiceImpl;
 
-
 public class AuthTokenFilter extends OncePerRequestFilter {
 	@Autowired
 	private JwtUtils jwtUtils;

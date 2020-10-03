@@ -10,12 +10,12 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/api")
 public class APIController {
-	
+
 	@GetMapping("/all")
 	public String allAccess() {
 		return "Public content";
 	}
-	
+
 	@GetMapping("/user")
 	@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
 	public String userAccess() {

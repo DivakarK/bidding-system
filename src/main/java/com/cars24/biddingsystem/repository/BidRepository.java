@@ -9,6 +9,6 @@ import com.cars24.biddingsystem.jpa.model.Auction;
 import com.cars24.biddingsystem.jpa.model.Bid;
 
 @Repository
-public interface BidRepository extends JpaRepository<Bid, Long>{
+public interface BidRepository extends JpaRepository<Bid, Long> {
 	List<Bid> findByAuction(Auction auction);
 }

@@ -1,14 +1,16 @@
 package com.cars24.biddingsystem.rest.model;
 
-public class BiddingMessage {
+import org.springframework.hateoas.RepresentationModel;
+
+public class BiddingMessage extends RepresentationModel<BiddingMessage> {
 	private String message;
-	
+
 	private String description;
-	
+
 	public BiddingMessage() {
 		// TODO Auto-generated constructor stub
 	}
-	
+
 	public BiddingMessage(String meessage, String description) {
 		this.message = meessage;
 		this.description = description;

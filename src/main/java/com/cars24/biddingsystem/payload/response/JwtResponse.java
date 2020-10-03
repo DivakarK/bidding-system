@@ -2,7 +2,11 @@ package com.cars24.biddingsystem.payload.response;
 
 import java.util.List;
 
-public class JwtResponse {
+import org.springframework.hateoas.RepresentationModel;
+
+import com.cars24.biddingsystem.rest.model.AuctionResponse;
+
+public class JwtResponse extends RepresentationModel<AuctionResponse> {
 	private String token;
 	private String type = "Bearer";
 	private Long id;

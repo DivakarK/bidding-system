@@ -11,5 +11,6 @@ import com.cars24.biddingsystem.jpa.model.Auction;
 @Repository
 public interface AuctionRepository extends JpaRepository<Auction, Long> {
 	Page<Auction> findByStatus(AuctionStatus status, Pageable pageable);
+
 	Page<Auction> findByItemName(String itemName, Pageable pageable);
 }

@@ -5,7 +5,7 @@ import org.springframework.hateoas.RepresentationModel;
 import com.cars24.biddingsystem.constants.AuctionStatus;
 
 
-public class AuctionResource extends RepresentationModel<AuctionResource>{
+public class AuctionResponse extends RepresentationModel<AuctionResponse>{
 	private long itemCode;
 	private String itemName;
 	private	float basePrice;

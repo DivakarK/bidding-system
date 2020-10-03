@@ -41,8 +41,8 @@ public class BiddingSystemApplication {
 					passwordEncoder.encode("cars24-bidding-system"), new Role(ERole.ROLE_MODERATOR)));
 
 			auctionRepository.save(new Auction("Chair", 1000.0f, 10.0f, AuctionStatus.RUNNING));
-			auctionRepository.save(new Auction("Table", 5000.0f, 50.0f, AuctionStatus.RUNNING));
-			auctionRepository.save(new Auction("Cot", 10000.0f, 100.0f, AuctionStatus.RUNNING));
+			auctionRepository.save(new Auction("Table", 5000.0f, 50.0f, AuctionStatus.OVER));
+			auctionRepository.save(new Auction("Cot", 10000.0f, 100.0f, AuctionStatus.OVER));
 			auctionRepository.save(new Auction("Car", 50000.0f, 500.0f, AuctionStatus.RUNNING));
 			auctionRepository.save(new Auction("Bus", 100000.0f, 1000.0f, AuctionStatus.RUNNING));
 			auctionRepository.save(new Auction("Bike", 8000.0f, 80.0f, AuctionStatus.RUNNING));

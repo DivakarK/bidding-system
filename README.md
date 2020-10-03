@@ -1,6 +1,6 @@
 # Read Me First
-The Bidding System
-This bidding system enables the users to place the bid for running auctions.
+The Bidding System  
+This bidding system enables the users to place the bid for running auctions.  
 
 # Getting Started
 
@@ -10,9 +10,9 @@ This bidding system enables the users to place the bid for running auctions.
 
 * Using Hibernate Persistence API for Database interactions. 
 
-* RESTFull API
+* Using JWT for security & Login
 
-* [Documentation] (https://maven.apache.org/guides/index.html)
+* RESTFull API
 
 =========================================================================================
 
@@ -27,9 +27,9 @@ This bidding system enables the users to place the bid for running auctions.
 ### Guides
 The following guides illustrate how to use some features concretely:
 
-* [Accessing JPA Data with REST](https://spring.io/guides/gs/accessing-data-rest/)
-* [Accessing Neo4j Data with REST](https://spring.io/guides/gs/accessing-neo4j-data-rest/)
-* [Accessing MongoDB Data with REST](https://spring.io/guides/gs/accessing-mongodb-data-rest/)
-* [Building a RESTful Web Service with Spring Boot Actuator](https://spring.io/guides/gs/actuator-service/)
-* [Accessing Data with JPA](https://spring.io/guides/gs/accessing-data-jpa/)
+* Build Application with the following commands  
+bidding-system> mvn clean install  
+bidding-system\target> java -jar bidding-system-0.0.1-SNAPSHOT.jar  
+
+* 
 

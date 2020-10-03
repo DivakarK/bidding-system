@@ -1,5 +1,8 @@
 package com.cars24.biddingsystem.controller;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +14,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -29,7 +31,7 @@ import com.cars24.biddingsystem.jpa.model.User;
 import com.cars24.biddingsystem.payload.request.BidRequest;
 import com.cars24.biddingsystem.repository.AuctionRepository;
 import com.cars24.biddingsystem.repository.UserRepository;
-import com.cars24.biddingsystem.rest.model.AuctionResource;
+import com.cars24.biddingsystem.rest.model.AuctionResponse;
 import com.cars24.biddingsystem.rest.model.BiddingMessage;
 import com.cars24.biddingsystem.services.AuctionService;
 
@@ -47,7 +49,7 @@ public class AuctionController {
 	@Autowired
 	AuctionService auctionService;
 
-	@GetMapping("")
+	@GetMapping
 	public ResponseEntity<Map<String, Object>> getAuctions(@RequestParam(required = false) AuctionStatus status,
 			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
 
@@ -56,39 +58,53 @@ public class AuctionController {
 	}
 
 	@GetMapping("/{id}")
-	public ResponseEntity<AuctionResource> getAuctionById(@PathVariable("id") long id) {
-		AuctionResource auctionData = this.auctionService.findById(id);
+	public ResponseEntity<AuctionResponse> getAuctionById(@PathVariable("id") long id) {
+		AuctionResponse auctionData = this.auctionService.findById(id);
 		return new ResponseEntity<>(auctionData, HttpStatus.OK);
 	}
 
-	@PostMapping("")
+	@PostMapping
 	@PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
-	public ResponseEntity<Auction> createAuction(@RequestBody Auction auction) {
+	public ResponseEntity<AuctionResponse> createAuction(@RequestBody Auction auction) {
 
 		Auction _auction = auctionRepository.save(
 				new Auction(auction.getItemName(), auction.getBasePrice(), auction.getStepRate(), auction.getStatus()));
-		return new ResponseEntity<>(_auction, HttpStatus.CREATED);
+		AuctionResponse response = new AuctionResponse();
+		response.setItemName(_auction.getItemName());
+		response.setBasePrice(_auction.getBasePrice());
+		response.setStepRate(_auction.getStepRate());
+		response.setStatus(_auction.getStatus());
+		response.setItemCode(_auction.getItemCode());
+		response.add(linkTo(methodOn(AuctionController.class).getAuctionById(response.getItemCode())).withSelfRel());
+		response.add(linkTo(methodOn(AuctionController.class).updateAuction(response.getItemCode(), null))
+				.withRel("update_auction"));
+		response.add(linkTo(methodOn(AuctionController.class).placeBid(null, response.getItemCode())).withRel("bid"));
+
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 
 	@PutMapping("/{id}")
 	@PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
-	public ResponseEntity<Auction> updateAuction(@PathVariable("id") long id, @RequestBody Auction auction) {
+	public ResponseEntity<AuctionResponse> updateAuction(@PathVariable("id") long id, @RequestBody Auction auction) {
 		Auction _auction = auctionRepository.findById(id)
 				.orElseThrow(() -> new AuctionNotFoundException("Auction not found"));
-		_auction.setItemName(auction.getItemName());
-		_auction.setBasePrice(auction.getBasePrice());
-		_auction.setStepRate(auction.getStepRate());
+
 		_auction.setStatus(auction.getStatus());
 
-		return new ResponseEntity<>(auctionRepository.save(_auction), HttpStatus.OK);
+		_auction = auctionRepository.save(_auction);
 
-	}
+		AuctionResponse response = new AuctionResponse();
+		response.setItemName(_auction.getItemName());
+		response.setBasePrice(_auction.getBasePrice());
+		response.setStepRate(_auction.getStepRate());
+		response.setStatus(_auction.getStatus());
+		response.setItemCode(_auction.getItemCode());
+		response.add(
+				linkTo(methodOn(AuctionController.class).updateAuction(response.getItemCode(), null)).withSelfRel());
+		response.add(linkTo(methodOn(AuctionController.class).placeBid(null, response.getItemCode())).withRel("bid"));
 
-	@DeleteMapping("/{id}")
-	@PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
-	public ResponseEntity<HttpStatus> deleteTutorial(@PathVariable("id") long id) {
-		auctionRepository.deleteById(id);
-		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+		return new ResponseEntity<>(response, HttpStatus.OK);
+
 	}
 
 	@PostMapping("/{itemCode}/bid")

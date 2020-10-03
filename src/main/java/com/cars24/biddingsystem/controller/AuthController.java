@@ -1,5 +1,8 @@
 package com.cars24.biddingsystem.controller;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -20,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.cars24.biddingsystem.constants.AuctionStatus;
 import com.cars24.biddingsystem.constants.ERole;
 import com.cars24.biddingsystem.jpa.model.Role;
 import com.cars24.biddingsystem.jpa.model.User;
@@ -59,37 +63,41 @@ public class AuthController {
 
 		SecurityContextHolder.getContext().setAuthentication(authentication);
 		String jwt = jwtUtils.generateJwtToken(authentication);
-		
-		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();		
-		List<String> roles = userDetails.getAuthorities().stream()
-				.map(item -> item.getAuthority())
+
+		UserDetailsImpl userDetails = (UserDetailsImpl) authentication.getPrincipal();
+		List<String> roles = userDetails.getAuthorities().stream().map(item -> item.getAuthority())
 				.collect(Collectors.toList());
 
-		return ResponseEntity.ok(new JwtResponse(jwt, 
-												 userDetails.getId(), 
-												 userDetails.getUsername(), 
-												 userDetails.getEmail(), 
-												 roles));
+		JwtResponse response = new JwtResponse(jwt, userDetails.getId(), userDetails.getUsername(),
+				userDetails.getEmail(), roles);
+
+		response.add(linkTo(methodOn(AuctionController.class).getAuctions(AuctionStatus.RUNNING, 0, 10))
+				.withRel("auctions"));
+		if (roles.contains("ROLE_ADMIN")) {
+			response.add(linkTo(AuctionController.class).withRel("auction"));
+		}
+
+		return ResponseEntity.ok(response);
 	}
 
 	@PostMapping("/signup")
 	public ResponseEntity<?> registerUser(@Valid @RequestBody SignupRequest signUpRequest) {
+		MessageResponse message = new MessageResponse();
+		message.add(linkTo(methodOn(AuthController.class).registerUser(null)).withSelfRel());
+		message.add(linkTo(methodOn(AuthController.class).authenticateUser(null)).withRel("signin"));
 		if (userRepository.existsByUsername(signUpRequest.getUsername())) {
-			return ResponseEntity
-					.badRequest()
-					.body(new MessageResponse("Error: Username is already taken!"));
+			message.setMessage("Error: Username is already taken!");
+			return ResponseEntity.badRequest().body(message);
 		}
 
 		if (userRepository.existsByEmail(signUpRequest.getEmail())) {
-			return ResponseEntity
-					.badRequest()
-					.body(new MessageResponse("Error: Email is already in use!"));
+			message.setMessage("Error: Email is already in use!");
+			return ResponseEntity.badRequest().body(message);
 		}
 
 		// Create new user's account
-		User user = new User(signUpRequest.getUsername(), 
-							 signUpRequest.getEmail(),
-							 encoder.encode(signUpRequest.getPassword()));
+		User user = new User(signUpRequest.getUsername(), signUpRequest.getEmail(),
+				encoder.encode(signUpRequest.getPassword()));
 
 		Set<String> strRoles = signUpRequest.getRole();
 		Set<Role> roles = new HashSet<>();
@@ -124,6 +132,14 @@ public class AuthController {
 		user.setRoles(roles);
 		userRepository.save(user);
 
-		return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
+		message.setMessage("User registered successfully!");
+		message.add(
+				linkTo(methodOn(AuctionController.class).getAuctions(AuctionStatus.RUNNING, 0, 5)).withRel("auctions"));
+
+		if (roles.contains("ROLE_ADMIN")) {
+			message.add(linkTo(AuctionController.class).withRel("add_update_auctions"));
+		}
+
+		return ResponseEntity.ok(message);
 	}
 }
