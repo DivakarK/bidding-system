@@ -129,7 +129,7 @@ public class AuctionService {
 		if (auction.getStatus() == AuctionStatus.OVER) {
 			this.bidRepository
 					.save(new Bid(auction, user, BidStatus.REJECTED, bidRequest.getBidAmount(), "auction closed"));
-			bm.setMessage("Bidding Rejected");
+			bm.setMessage("Bid Rejected");
 			bm.setDescription("Auction is not RUNNING");
 			return new ResponseEntity<>(bm, HttpStatus.NOT_ACCEPTABLE);
 		}
@@ -165,7 +165,7 @@ public class AuctionService {
 						+ " is equals min_bid_amount " + minAllowedBid);
 			}
 
-			bm.setMessage("Bidding Rejected");
+			bm.setMessage("Bid Rejected");
 			this.bidRepository.save(new Bid(auction, user, BidStatus.REJECTED, bidRequest.getBidAmount(), reason));
 			response = new ResponseEntity<>(bm, HttpStatus.NOT_ACCEPTABLE);
 		}
