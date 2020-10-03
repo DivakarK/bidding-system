@@ -12,6 +12,7 @@ import javax.persistence.OneToMany;
 import javax.persistence.Table;
 
 import com.cars24.biddingsystem.constants.AuctionStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 
 
 @Entity
@@ -41,6 +42,7 @@ public class Auction {
 		this.status = status;
 	}
 	
+	@JsonBackReference
 	@OneToMany(mappedBy="auction")
 	private Collection<Bid> bids = new ArrayList<>();
 	

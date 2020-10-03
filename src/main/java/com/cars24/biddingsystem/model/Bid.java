@@ -13,6 +13,7 @@ import javax.persistence.OneToOne;
 import javax.persistence.Table;
 
 import com.cars24.biddingsystem.constants.BidStatus;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 @Entity
 @Table(name = "BIDS")
@@ -21,6 +22,7 @@ public class Bid {
 	@GeneratedValue
 	private long id;
 	
+	@JsonManagedReference
 	@ManyToOne
 	@JoinColumn(name="auction_id")
 	private Auction auction;

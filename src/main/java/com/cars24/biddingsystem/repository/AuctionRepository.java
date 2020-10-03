@@ -1,7 +1,7 @@
 package com.cars24.biddingsystem.repository;
 
-import java.util.List;
-
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -10,6 +10,6 @@ import com.cars24.biddingsystem.model.Auction;
 
 @Repository
 public interface AuctionRepository extends JpaRepository<Auction, Long> {
-	List<Auction> findByStatus(AuctionStatus status);
-	List<Auction> findByItemName(String itemName);
+	Page<Auction> findByStatus(AuctionStatus status, Pageable pageable);
+	Page<Auction> findByItemName(String itemName, Pageable pageable);
 }

@@ -1,13 +1,10 @@
 package com.cars24.biddingsystem.controller;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -25,154 +22,97 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cars24.biddingsystem.constants.AuctionStatus;
-import com.cars24.biddingsystem.constants.BidStatus;
 import com.cars24.biddingsystem.exception.AuctionNotFoundException;
 import com.cars24.biddingsystem.exception.UserNotFoundException;
 import com.cars24.biddingsystem.model.Auction;
-import com.cars24.biddingsystem.model.Bid;
-import com.cars24.biddingsystem.model.ErrorMessage;
 import com.cars24.biddingsystem.model.BiddingMessage;
 import com.cars24.biddingsystem.model.User;
 import com.cars24.biddingsystem.payload.request.BidRequest;
 import com.cars24.biddingsystem.repository.AuctionRepository;
-import com.cars24.biddingsystem.repository.BidRepository;
 import com.cars24.biddingsystem.repository.UserRepository;
+import com.cars24.biddingsystem.rest.model.AuctionResource;
+import com.cars24.biddingsystem.services.AuctionService;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/auctions")
 public class AuctionController {
 
 	@Autowired
 	AuctionRepository auctionRepository;
-	
+
 	@Autowired
 	UserRepository userRepository;
-	
+
 	@Autowired
-	BidRepository bidRepository;
+	AuctionService auctionService;
 
-	@GetMapping("/auctions")
-	@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-	public ResponseEntity<List<Auction>> getAuctions(@RequestParam(required = false) AuctionStatus status) {
-		try {
-			List<Auction> auctions = new ArrayList<Auction>();
-			System.out.println("Divakar: " + status);
-			if (status == null)
-				auctionRepository.findAll().forEach(auctions::add);
-			else
-				auctionRepository.findByStatus(status).forEach(auctions::add);
+	@GetMapping("")
+	public ResponseEntity<Map<String, Object>> getAuctions(@RequestParam(required = false) AuctionStatus status,
+			@RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "5") int size) {
 
-			if (auctions.isEmpty()) {
-				return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-			}
-
-			return new ResponseEntity<>(auctions, HttpStatus.OK);
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		Pageable paging = PageRequest.of(page, size);
+		return this.auctionService.find(status, paging);
 	}
 
-	@GetMapping("/auctions/{id}")
-	@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-	public ResponseEntity<Auction> getAuctionById(@PathVariable("id") long id) {
-		Optional<Auction> auctionData = auctionRepository.findById(id);
-
-		if (auctionData.isPresent()) {
-			return new ResponseEntity<>(auctionData.get(), HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
+	@GetMapping("/{id}")
+	public ResponseEntity<AuctionResource> getAuctionById(@PathVariable("id") long id) {
+		AuctionResource auctionData = this.auctionService.findById(id);
+		return new ResponseEntity<>(auctionData, HttpStatus.OK);
 	}
 
-	@PostMapping("/auctions")
-	@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+	@PostMapping("")
+	@PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
 	public ResponseEntity<Auction> createAuction(@RequestBody Auction auction) {
-		try {
-			Auction _auction = auctionRepository.save(new Auction(auction.getItemName(), auction.getBasePrice(),
-					auction.getStepRate(), auction.getStatus()));
-			return new ResponseEntity<>(_auction, HttpStatus.CREATED);
-		} catch (Exception e) {
-			return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+
+		Auction _auction = auctionRepository.save(
+				new Auction(auction.getItemName(), auction.getBasePrice(), auction.getStepRate(), auction.getStatus()));
+		return new ResponseEntity<>(_auction, HttpStatus.CREATED);
 	}
 
-	@PutMapping("/auctions/{id}")
-	@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+	@PutMapping("/{id}")
+	@PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
 	public ResponseEntity<Auction> updateAuction(@PathVariable("id") long id, @RequestBody Auction auction) {
-		Optional<Auction> auctionData = auctionRepository.findById(id);
+		Auction _auction = auctionRepository.findById(id)
+				.orElseThrow(() -> new AuctionNotFoundException("Auction not found"));
+		_auction.setItemName(auction.getItemName());
+		_auction.setBasePrice(auction.getBasePrice());
+		_auction.setStepRate(auction.getStepRate());
+		_auction.setStatus(auction.getStatus());
 
-		if (auctionData.isPresent()) {
-			Auction _auction = auctionData.get();
-			_auction.setItemName(auction.getItemName());
-			_auction.setBasePrice(auction.getBasePrice());
-			_auction.setStepRate(auction.getStepRate());
-			_auction.setStatus(auction.getStatus());
+		return new ResponseEntity<>(auctionRepository.save(_auction), HttpStatus.OK);
 
-			return new ResponseEntity<>(auctionRepository.save(_auction), HttpStatus.OK);
-		} else {
-			return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-		}
 	}
 
-	@DeleteMapping("/auctions/{id}")
-	@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
+	@DeleteMapping("/{id}")
+	@PreAuthorize("hasRole('MODERATOR') or hasRole('ADMIN')")
 	public ResponseEntity<HttpStatus> deleteTutorial(@PathVariable("id") long id) {
-		try {
-			auctionRepository.deleteById(id);
-			return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-		} catch (Exception e) {
-			return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-		}
+		auctionRepository.deleteById(id);
+		return new ResponseEntity<>(HttpStatus.NO_CONTENT);
 	}
-	
-	@PostMapping("/auctions/{itemCode}/bid")
+
+	@PostMapping("/{itemCode}/bid")
 	@PreAuthorize("hasRole('USER') or hasRole('MODERATOR') or hasRole('ADMIN')")
-	public ResponseEntity<BiddingMessage> placeBid(@RequestBody BidRequest bidRequest, @PathVariable("itemCode") long itemCode) {
-		
+	public ResponseEntity<BiddingMessage> placeBid(@RequestBody BidRequest bidRequest,
+			@PathVariable("itemCode") long itemCode) {
+
 		/**
 		 * Get user info from Security context
 		 */
 		Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-		
+
 		User user = this.userRepository.findByUsername(authentication.getName())
 				.orElseThrow(() -> new UserNotFoundException("User not found"));
-				
+
 		Auction auction = this.auctionRepository.findById(itemCode)
-							.orElseThrow(() -> new AuctionNotFoundException("Item code does not exists."));
-		
+				.orElseThrow(() -> new AuctionNotFoundException("Item code does not exists."));
+
 		System.out.println("User name:: " + authentication.getName());
-		
+
 		System.out.println("Auction id:: " + auction.getItemCode());
-		
-		ResponseEntity<BiddingMessage> response = updateBid(user, auction, bidRequest);
-		
-		return response;
-	}
-	
-	public synchronized ResponseEntity<BiddingMessage> updateBid(User user, Auction auction, BidRequest bidRequest) {
-		
-		Bid maxBid = auction.getBids().stream()
-						.filter(b -> b.getStatus() == BidStatus.ACCEPTED)
-						.collect(Collectors.maxBy(Comparator.comparing(Bid::getBidPrice)))
-						.orElseGet(() -> new Bid());
-		
-		float minBidAllowed = Float.sum(auction.getStepRate(), maxBid.getBidPrice());
-		
-		BiddingMessage bm = new BiddingMessage();
-		ResponseEntity<BiddingMessage> response;
-		
-		if(bidRequest.getBidAmount() > minBidAllowed) {
-			this.bidRepository.save(new Bid(auction, user, BidStatus.ACCEPTED, bidRequest.getBidAmount()));
-			bm.setMessage("Bidding Accepted");
-			response = new ResponseEntity<>(bm, HttpStatus.CREATED);
-		} else {
-			this.bidRepository.save(new Bid(auction, user, BidStatus.REJECTED, bidRequest.getBidAmount()));
-			bm.setMessage("Bidding Rejected");
-			bm.setDescription("Rejected because your bidding amount " + bidRequest.getBidAmount() + " is less than min bid amount " + minBidAllowed);
-			response = new ResponseEntity<>(bm, HttpStatus.NOT_ACCEPTABLE);
-		}
-		
+
+		ResponseEntity<BiddingMessage> response = this.auctionService.updateBid(user, auction, bidRequest);
+
 		return response;
 	}
 }
