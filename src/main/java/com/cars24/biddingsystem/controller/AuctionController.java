@@ -24,8 +24,6 @@ import com.cars24.biddingsystem.constants.AuctionStatus;
 import com.cars24.biddingsystem.constants.BidStatus;
 import com.cars24.biddingsystem.jpa.model.Auction;
 import com.cars24.biddingsystem.payload.request.BidRequest;
-import com.cars24.biddingsystem.repository.AuctionRepository;
-import com.cars24.biddingsystem.repository.UserRepository;
 import com.cars24.biddingsystem.rest.model.AuctionResponse;
 import com.cars24.biddingsystem.rest.model.BiddingMessage;
 import com.cars24.biddingsystem.services.AuctionService;
@@ -34,12 +32,6 @@ import com.cars24.biddingsystem.services.AuctionService;
 @RestController
 @RequestMapping("/api/auctions")
 public class AuctionController {
-
-	@Autowired
-	AuctionRepository auctionRepository;
-
-	@Autowired
-	UserRepository userRepository;
 
 	@Autowired
 	AuctionService auctionService;

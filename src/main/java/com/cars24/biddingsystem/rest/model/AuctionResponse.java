@@ -47,5 +47,17 @@ public class AuctionResponse extends RepresentationModel<AuctionResponse>{
 	}
 	public void setRecentBidPrice(float recentBidPrice) {
 		this.recentBidPrice = recentBidPrice;
-	}	
+	}
+	
+	@Override
+	public String toString() {
+		return "[" 
+				+itemCode 
+				+itemName
+				+basePrice
+				+stepRate
+				+status
+				+recentBidPrice 
+				+ "]";
+	}
 }
