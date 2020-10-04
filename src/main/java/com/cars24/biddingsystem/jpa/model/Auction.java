@@ -90,4 +90,9 @@ public class Auction {
 	public void setBids(Collection<Bid> bids) {
 		this.bids = bids;
 	}
+	
+	@Override
+	public String toString() {
+		return "[" + this.itemName + " " + this.basePrice + " " + this.status + " " + this.stepRate + "]";
+	}
 }

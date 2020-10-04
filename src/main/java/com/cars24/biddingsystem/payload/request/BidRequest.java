@@ -13,4 +13,8 @@ public class BidRequest {
 	public void setBidAmount(float bidAmount) {
 		this.bidAmount = bidAmount;
 	}
+	@Override
+	public String toString() {
+		return "{bidAmount:" + bidAmount + "}";
+	}
 }
