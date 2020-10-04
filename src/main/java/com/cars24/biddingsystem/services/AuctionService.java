@@ -173,10 +173,6 @@ public class AuctionService {
 		Auction auction = this.auctionRepository.findById(itemCode)
 				.orElseThrow(() -> new AuctionNotFoundException("Item code does not exists."));
 
-		System.out.println("User name:: " + authentication.getName());
-
-		System.out.println("Auction id:: " + auction.getItemCode());
-
 		return placeBidSecurely(user, auction, bidRequest);
 
 	}
@@ -217,7 +213,9 @@ public class AuctionService {
 
 		float minAllowedBid = 0.0f;
 		float prevBidAmount = maxBid.getBidPrice();
-		System.out.println("Min price:: " + maxBid.getBidPrice());
+		
+		logger.info("Min price:: " + maxBid.getBidPrice());
+		
 		if (prevBidAmount == 0.0f) {
 			minAllowedBid = basePrice;
 		} else {

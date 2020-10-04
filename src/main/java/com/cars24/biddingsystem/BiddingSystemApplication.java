@@ -48,7 +48,7 @@ public class BiddingSystemApplication {
 			auctionRepository.save(new Auction("Bike", 8000.0f, 80.0f, AuctionStatus.RUNNING));
 			auctionRepository.save(new Auction("Mobile oppo", 10000.0f, 100.0f, AuctionStatus.RUNNING));
 			auctionRepository.save(new Auction("Computor", 35000.0f, 35.0f, AuctionStatus.RUNNING));
-			auctionRepository.save(new Auction("Key board", 800.0f, 8.0f, AuctionStatus.RUNNING));
+			auctionRepository.save(new Auction("Key board", 800.0f, 8.0f, AuctionStatus.YET_TO_START));
 			auctionRepository.save(new Auction("Cattle", 9900.0f, 9.0f, AuctionStatus.RUNNING));
 
 		};

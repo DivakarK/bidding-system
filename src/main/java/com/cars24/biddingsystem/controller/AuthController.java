@@ -135,8 +135,7 @@ public class AuthController {
 		message.setMessage("User registered successfully!");
 		message.add(
 				linkTo(methodOn(AuctionController.class).getAuctions(AuctionStatus.RUNNING, 0, 5)).withRel("auctions"));
-
-		if (roles.contains("ROLE_ADMIN")) {
+		if (strRoles.contains("admin")) {
 			message.add(linkTo(AuctionController.class).withRel("add_update_auctions"));
 		}
 
