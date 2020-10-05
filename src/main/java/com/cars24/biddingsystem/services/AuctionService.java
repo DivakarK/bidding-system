@@ -232,6 +232,7 @@ public class AuctionService {
 			String reason = "bid amount is less";
 			bm.setDescription("Because your bidding amount " + bidRequest.getBidAmount()
 					+ " is less than min_bid_amount " + minAllowedBid);
+			logger.info(bidRequest.getBidAmount() + "<------>" + minAllowedBid);
 			if (bidRequest.getBidAmount() == minAllowedBid) {
 				reason = "bid amount is same as existing";
 				bm.setDescription("Because your bidding amount " + bidRequest.getBidAmount()
